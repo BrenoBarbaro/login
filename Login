@@ -1,6 +1,6 @@
 https://drive.google.com/file/d/0B_aOLYRrVoJJY0V4d0JqMWNBTWs/view
 
-#include <stdio.h >
+e <stdio.h >
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,8 +8,8 @@ typedef struct usuarios
 {
     char usuarioCadastrado[11];
     char senhaCadastrado[11];
-    struct Login * proximo;
-} Login;
+    struct Login *proximo;
+}Login;
 
 Login *ListaUsers = NULL;
 
@@ -34,7 +34,7 @@ void cadastroUsuario()
         if((pUser = fopen("Usuarios.txt","r"))== NULL)
         {
             pUser = fopen("Usuarios.txt","w");
-            fprintf(pUser,"%s\n%s",ListaUsers->usuarioCadastrado,ListaUsers->senhaCadastrado);
+            fprintf(pUser,"%s%s",ListaUsers->usuarioCadastrado,ListaUsers->senhaCadastrado);
             fclose(pUser);
         }
     }
