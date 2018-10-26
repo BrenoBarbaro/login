@@ -1,0 +1,147 @@
+https://drive.google.com/file/d/0B_aOLYRrVoJJY0V4d0JqMWNBTWs/view
+
+#include <stdio.h >
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct usuarios
+{
+    char usuarioCadastrado[11];
+    char senhaCadastrado[11];
+    struct Login * proximo;
+} Login;
+
+Login *ListaUsers = NULL;
+
+void cadastroUsuario()
+{
+    FILE *pUser;
+
+    Login *novo = (Login*) malloc(sizeof(Login));
+    Login *aux = ListaUsers;
+
+    printf("---> Cadastro de Usuario <---\n\n");
+    printf("Login: ");
+    fflush(stdin);
+    fgets(novo->usuarioCadastrado,sizeof(novo->usuarioCadastrado),stdin);
+    printf("Senha: ");
+    fflush(stdin);
+    fgets(novo->senhaCadastrado,sizeof(novo->senhaCadastrado),stdin);
+    fflush(stdin);
+    if(ListaUsers==NULL)
+    {
+        ListaUsers=novo;
+        if((pUser = fopen("Usuarios.txt","r"))== NULL)
+        {
+            pUser = fopen("Usuarios.txt","w");
+            fprintf(pUser,"%s\n%s",ListaUsers->usuarioCadastrado,ListaUsers->senhaCadastrado);
+            fclose(pUser);
+        }
+    }
+    else
+    {
+        pUser = fopen("Usuarios.txt","a");
+        fprintf(pUser,"%s",ListaUsers->senhaCadastrado);
+        fprintf(pUser,"%s",ListaUsers->usuarioCadastrado);
+        fclose(pUser);
+    }
+}
+
+int MostraLogin()
+{
+    Login *aux=ListaUsers;
+    Login *lLogin = (Login*) malloc(sizeof(Login));
+    lLogin->proximo = NULL;
+
+    FILE *log;
+    FILE *log2;
+    log = fopen("Log.txt","w");
+    fclose(log);
+
+    char usuario[11];
+    char senha[11];
+
+    if(ListaUsers==NULL)
+    {
+        log =fopen("Log.txt","a");
+        fprintf(log,"Usuarios nao cadastrados\n");
+        fclose(log);
+        return 1;
+    }
+    else if(ListaUsers!=NULL)
+    {
+        log = fopen("Log.txt","r");
+        fscanf(log,"%s",ListaUsers->usuarioCadastrado);
+        fscanf(log,"%s",ListaUsers->senhaCadastrado);
+        fclose(log);
+
+        Login *aux = ListaUsers;
+        printf("---> Tela Inicial <---\n\n");
+        printf("Login: ");
+        fflush(stdin);
+        fgets(usuario,sizeof(usuario),stdin);
+        fflush(stdin);
+        while(aux!=NULL)
+        {
+            if(strcmp(usuario,aux->usuarioCadastrado),stdin)
+            {
+                printf("\nSenha:");
+                fgets(senha,sizeof(senha),stdin);
+            }
+            else
+            {
+                if(log == NULL)
+                {
+                    log2 = fopen("UserInvalido.txt","w");
+                    fputs(usuario,log2);
+                    fclose(log2);
+                }
+                else
+                {
+                    log = fopen("UserInvalido.txt","w");
+                    fputs(usuario,log);
+                    fclose(log);
+                }
+                system("PAUSE");
+            }
+        }
+    }
+}
+
+int main()
+{
+    FILE *log;
+    log = fopen("OpcaoInvalida.txt","w");
+    fclose(log);
+    log = fopen("Saiu.txt","w");
+    fclose(log);
+
+    int op,qtdsaiu=0;
+
+    do
+    {
+        system("CLS");
+        printf("1 - Cadastrar Usuario\n");
+        printf("2 - Login\n");
+        printf("5 - Sair\n");
+        printf("\nOpcao: ");
+        scanf("%d",&op);
+        switch(op)
+        {
+            case 1: cadastroUsuario();  break;
+            case 2: MostraLogin();  break;
+            case 5: log = fopen("Saiu.txt","a");
+                    fprintf(log,"Saiu\n");
+                    fclose(log);
+                    break;
+
+            default:log = fopen("OpcaoInvalida.txt","a");
+                    fprintf(log,"ERRO: Opcao digitada --> %d\n",op);
+                    fclose(log);
+                    printf("\n\nOpcao invalida.\n\n");
+                    system("PAUSE");
+            break;
+        }
+    }while(op!=5);
+    return 0;
+}
