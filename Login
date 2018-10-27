@@ -1,6 +1,6 @@
 https://drive.google.com/file/d/0B_aOLYRrVoJJY0V4d0JqMWNBTWs/view
 
-e <stdio.h >
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -74,7 +74,7 @@ int MostraLogin()
         fscanf(log,"%s",ListaUsers->usuarioCadastrado);
         fscanf(log,"%s",ListaUsers->senhaCadastrado);
         fclose(log);
-
+        printf("aqui usuario:%s\tsenha:%s", ListaUsers->usuarioCadastrado, ListaUsers->senhaCadastrado );
         Login *aux = ListaUsers;
         printf("---> Tela Inicial <---\n\n");
         printf("Login: ");
@@ -145,3 +145,4 @@ int main()
     }while(op!=5);
     return 0;
 }
+
