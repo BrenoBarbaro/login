@@ -2,7 +2,26 @@ https://drive.google.com/file/d/0B_aOLYRrVoJJY0V4d0JqMWNBTWs/view
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include <string.h>
+#include <windows.h>
+#include <conio.h>
+
+typedef struct produtos
+{
+    char codProduto[5];
+    char nomeProduto[21];
+    double valorProduto;
+    struct Lista *proximo;
+} Lista;
+
+typedef struct compras
+{
+    char codProduto[5];
+    char nomeProduto[21];
+    double valorProduto;
+    struct ListaCompras *proximo;
+} ListaCompras;
 
 typedef struct usuarios
 {
@@ -11,39 +30,116 @@ typedef struct usuarios
     struct Login *proximo;
 }Login;
 
+Lista *inicio = NULL;
+ListaCompras *cprodutos = NULL;
 Login *ListaUsers = NULL;
+
+void gotoxy(int x, int y){
+     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),(COORD){x-1,y-1});
+}
+
+void menu();
+void cadastroUsuario();
+void listaFuncionario();
+void PesquisaFuncionario();
+void ProdutosVendidos();
+int MostraLogin();
+void sair();
+
+//-------------------------------------------------------------------------------
+
+int main(void)
+{
+    FILE *inic;
+    inic = fopen("Usuarios.txt","rb");
+
+    if(inic == NULL)
+    {
+        inic = fopen("Usuarios.txt","ab");
+        cadastroUsuario();
+    }
+    else
+    {
+        MostraLogin();  // --> Funções seguintes em MostraLogin
+    }
+    fclose(inic);
+
+    return 0;
+}
+
+void menu()
+{
+    char op;
+
+    do
+    {
+        fflush(stdin);
+        system("cls");
+        printf("******************************************************");
+        printf("\n*                 NewHorizon Market                  *");
+        printf("\n*                                                    *");
+        printf("\n*      1 - Cadastrar Funcionario                     *");
+        printf("\n*      2 - Listar Funcionarios                       *");
+        printf("\n*      3 - Pesquisar Funcionario                     *");
+        printf("\n*      4 - Nomes Iguais                              *");
+        printf("\n*                                                    *");
+        printf("\n*      5 - Sair                                      *");
+        printf("\n*                                                    *");
+        printf("\n******************************************************");
+        printf("\n*      Opcao:                                        *");
+        printf("\n******************************************************");
+        op = getch();
+        switch(op)
+        {
+
+            case '1': cadastroUsuario(); break;
+
+            case '2': listaFuncionario(); break;
+
+            case '3': PesquisaFuncionario(); break;
+
+            case '4': ProdutosVendidos(); break;
+
+            case '5': sair(); exit(0); break;
+
+            default: printf("Opcao Invalida\n\nPressione Enter para continuar!"); break;
+        }
+    }while(op != 5);
+}
 
 void cadastroUsuario()
 {
     FILE *pUser;
+    Login ctt;
 
-    Login *novo = (Login*) malloc(sizeof(Login));
-    Login *aux = ListaUsers;
+    pUser = fopen("Usuarios.txt","ab");
 
-    printf("---> Cadastro de Usuario <---\n\n");
-    printf("Login: ");
-    fflush(stdin);
-    fgets(novo->usuarioCadastrado,sizeof(novo->usuarioCadastrado),stdin);
-    printf("Senha: ");
-    fflush(stdin);
-    fgets(novo->senhaCadastrado,sizeof(novo->senhaCadastrado),stdin);
-    fflush(stdin);
-    if(ListaUsers==NULL)
+    char c;
+
+    if(pUser == NULL)
     {
-        ListaUsers=novo;
-        if((pUser = fopen("Usuarios.txt","r"))== NULL)
-        {
-            pUser = fopen("Usuarios.txt","w");
-            fprintf(pUser,"%s%s",ListaUsers->usuarioCadastrado,ListaUsers->senhaCadastrado);
-            fclose(pUser);
-        }
+        printf("Problema na abertura do arquivo!\n");
     }
     else
     {
-        pUser = fopen("Usuarios.txt","a");
-        fprintf(pUser,"%s",ListaUsers->senhaCadastrado);
-        fprintf(pUser,"%s",ListaUsers->usuarioCadastrado);
+        do{
+            system("CLS");
+            printf("\n\n---> Cadastro de Usuario <---\n\n");
+            printf("Login: ");
+            fflush(stdin);
+            gets(ctt.usuarioCadastrado);
+            printf("Senha: ");
+            fflush(stdin);
+            gets(ctt.senhaCadastrado);
+            fflush(stdin);
+
+            fwrite(&ctt,sizeof(Login),1,pUser);
+
+            printf("Cadastrar outro funcionario? (s/n)");
+            c = getch();
+        }while(c == 's');
         fclose(pUser);
+        menu();
     }
 }
 
@@ -54,95 +150,128 @@ int MostraLogin()
     lLogin->proximo = NULL;
 
     FILE *log;
-    FILE *log2;
     log = fopen("Log.txt","w");
     fclose(log);
 
     char usuario[11];
     char senha[11];
+    int op;
 
-    if(ListaUsers==NULL)
-    {
-        log =fopen("Log.txt","a");
-        fprintf(log,"Usuarios nao cadastrados\n");
-        fclose(log);
-        return 1;
-    }
-    else if(ListaUsers!=NULL)
-    {
-        log = fopen("Log.txt","r");
-        fscanf(log,"%s",ListaUsers->usuarioCadastrado);
-        fscanf(log,"%s",ListaUsers->senhaCadastrado);
-        fclose(log);
-        printf("aqui usuario:%s\tsenha:%s", ListaUsers->usuarioCadastrado, ListaUsers->senhaCadastrado );
-        Login *aux = ListaUsers;
         printf("---> Tela Inicial <---\n\n");
         printf("Login: ");
         fflush(stdin);
         fgets(usuario,sizeof(usuario),stdin);
+        usuario[strcspn(usuario,"\r\n")] = '\0';
         fflush(stdin);
-        while(aux!=NULL)
+        if(strcmp(usuario,aux->usuarioCadastrado),stdin)
         {
-            if(strcmp(usuario,aux->usuarioCadastrado),stdin)
+            printf("\nSenha:");
+            fgets(senha,sizeof(senha),stdin);
+            senha[strcspn(senha,"\r\n")] = '\0';
+            if(strcmp(senha,aux->senhaCadastrado),stdin)
             {
-                printf("\nSenha:");
-                fgets(senha,sizeof(senha),stdin);
-            }
-            else
-            {
-                if(log == NULL)
-                {
-                    log2 = fopen("UserInvalido.txt","w");
-                    fputs(usuario,log2);
-                    fclose(log2);
-                }
-                else
-                {
-                    log = fopen("UserInvalido.txt","w");
-                    fputs(usuario,log);
-                    fclose(log);
-                }
+                menu();
                 system("PAUSE");
             }
         }
-    }
 }
 
-int main()
+void listaFuncionario()
 {
-    FILE *log;
-    log = fopen("OpcaoInvalida.txt","w");
-    fclose(log);
-    log = fopen("Saiu.txt","w");
-    fclose(log);
+    FILE *pUser;
+    Login ctt;
 
-    int op,qtdsaiu=0;
+    pUser = fopen("Usuarios.txt","rb");
 
-    do
+    if(pUser == NULL)
     {
-        system("CLS");
-        printf("1 - Cadastrar Usuario\n");
-        printf("2 - Login\n");
-        printf("5 - Sair\n");
-        printf("\nOpcao: ");
-        scanf("%d",&op);
-        switch(op)
+        printf("Problema na abertura do arquivo!\n");
+    }
+    else
+    {printf("\n\n");
+        while( fread(&ctt, sizeof(Login),1,pUser) == 1)
         {
-            case 1: cadastroUsuario();  break;
-            case 2: MostraLogin();  break;
-            case 5: log = fopen("Saiu.txt","a");
-                    fprintf(log,"Saiu\n");
-                    fclose(log);
-                    break;
-
-            default:log = fopen("OpcaoInvalida.txt","a");
-                    fprintf(log,"ERRO: Opcao digitada --> %d\n",op);
-                    fclose(log);
-                    printf("\n\nOpcao invalida.\n\n");
-                    system("PAUSE");
-            break;
+            printf("------------------------------------------------------\n");
+            printf("Usuario: %s\tSenha: %s\n",ctt.usuarioCadastrado,ctt.senhaCadastrado);
+            printf("------------------------------------------------------\n\n");
         }
-    }while(op!=5);
-    return 0;
+    }
+    fclose(pUser);
+    fflush(stdin);
+    getch();
 }
 
+void PesquisaFuncionario()
+{
+    FILE *pUser;
+    Login ctt;
+    char usuario[30];
+
+    pUser = fopen("Usuarios.txt","rb");
+
+    if(pUser == NULL)
+    {
+        printf("Problemas na abertura do arquivo!\n");
+    }
+    else
+    {
+        fflush(stdin);
+        printf("\n\nDigite o nome a pesquisar: ");
+        gets(usuario);
+
+        while( fread(&ctt,sizeof(Login),1,pUser)==1)
+        {
+            if(strcmp(usuario, ctt.usuarioCadastrado)==0)
+            {
+                printf("------------------------------------------------------\n");
+                printf("Usuario: %s\tSenha: %s\n",ctt.usuarioCadastrado,ctt.senhaCadastrado);
+                printf("------------------------------------------------------\n\n");
+            }
+        }
+    }
+    fclose(pUser);
+    getch();
+}
+
+void ProdutosVendidos()
+{
+    FILE *pUser;
+    Login ctt;
+
+    pUser = fopen("Usuarios.txt","rb");
+
+    if(pUser == NULL)
+    {
+        printf("Problemas na abertura do arquivo!\n");
+    }
+    else
+    {
+        char selecionaProduto[30];
+
+        printf("Digite o Produto: ");
+        scanf("%s",&selecionaProduto);
+
+        while(fread(&ctt,sizeof(Login),1,pUser)==1)
+        {
+            if(selecionaProduto[0] == ctt.usuarioCadastrado[0])
+            {
+                printf("------------------------------------------------------\n");
+                printf("Usuario: %s\tSenha: %s\n",ctt.usuarioCadastrado,ctt.senhaCadastrado);
+                printf("------------------------------------------------------\n\n");
+            }
+        }
+    }
+    fclose(pUser);
+    getch();
+}
+
+void sair()
+{
+    system("CLS");
+    printf("*************************************************");
+    printf("\n*                                               *");
+    printf("\n*     Obrigado , NewHorizon Market agradece     *");
+    printf("\n*         sua presenca, volte sempre.           *");
+    printf("\n*                                               *");
+    printf("\n*************************************************\n");
+}
