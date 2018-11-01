@@ -145,35 +145,51 @@ void cadastroUsuario()
 
 int MostraLogin()
 {
-    Login *aux=ListaUsers;
-    Login *lLogin = (Login*) malloc(sizeof(Login));
-    lLogin->proximo = NULL;
+    FILE *pUser;
+    Login ctt;
 
-    FILE *log;
-    log = fopen("Log.txt","w");
-    fclose(log);
+    char cUsuario[5];
+    char cSenha[11];
+    int tentativas=0;
+    int vezes=3;
 
-    char usuario[11];
-    char senha[11];
-    int op;
+    pUser = fopen("Usuarios.txt","rb");
 
-        printf("---> Tela Inicial <---\n\n");
-        printf("Login: ");
-        fflush(stdin);
-        fgets(usuario,sizeof(usuario),stdin);
-        usuario[strcspn(usuario,"\r\n")] = '\0';
-        fflush(stdin);
-        if(strcmp(usuario,aux->usuarioCadastrado),stdin)
-        {
-            printf("\nSenha:");
-            fgets(senha,sizeof(senha),stdin);
-            senha[strcspn(senha,"\r\n")] = '\0';
-            if(strcmp(senha,aux->senhaCadastrado),stdin)
+    if(pUser == NULL)
+    {
+        printf("Problemas na abertura ");fd
+    }
+    else
+    {
+        do{
+            printf("---> Tela Inicial <---\n\n");
+            fflush(stdin);
+            printf("\n\nUsuario: ");
+            gets(cUsuario);
+            fflush(stdin);
+            printf("\nSenha: ");
+            gets(cSenha);
+
+            while( fread(&ctt,sizeof(Login),1,pUser)==1)
             {
-                menu();
-                system("PAUSE");
+                if(strcmp(cUsuario, ctt.usuarioCadastrado)==0)
+                {
+                    if(strcmp(cSenha, ctt.senhaCadastrado)==0)
+                    {
+                        menu();
+                    }
+                }
+                else
+                {
+
+                }
             }
-        }
+            FILE *erro;
+            erro = fopen("ErroLogin.txt","a");
+            fprintf("User: %s\tSenha: %s\n",cUsuario,cSenha);
+            fclose(erro);
+        }while(tentativas>3);
+    }
 }
 
 void listaFuncionario()
@@ -275,3 +291,4 @@ void sair()
     printf("\n*                                               *");
     printf("\n*************************************************\n");
 }
+
